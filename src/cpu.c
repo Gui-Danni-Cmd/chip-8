@@ -1,0 +1,49 @@
+#include "cpu.h"
+#include "dram.h"
+#include "files.h"
+#include "render.h"
+#include <SDL2/SDL.h>
+#include <stdlib.h>
+#include <string.h>
+
+void initCPU(CPU *chip) {
+  chip->pc = 0x200;
+  chip->i = 0;
+  chip->sp = 0;
+
+  chip->dram = initDRAM();
+  if (chip->dram == NULL) {
+    fprintf(stderr, "Erro: Falha ao inicializar a DRAM.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  chip->sound_timer = 10;
+  chip->audio_playing = false;
+
+  memset(chip->v, 0, sizeof(chip->v));
+  memset(chip->stack, 0, sizeof(chip->stack));
+  memset(chip->screen, 0, sizeof(chip->screen));
+  memset(chip->keys, 0, sizeof(chip->keys));
+
+  const uint8_t fontset[80] = {
+      0xF0, 0x90, 0x90, 0x90, 0xF0, 0x20, 0x60, 0x20, 0x20, 0x70, 0xF0, 0x10,
+      0xF0, 0x80, 0xF0, 0xF0, 0x10, 0xF0, 0x10, 0xF0, 0x90, 0x90, 0xF0, 0x10,
+      0x10, 0xF0, 0x80, 0xF0, 0x10, 0xF0, 0xF0, 0x80, 0xF0, 0x90, 0xF0, 0xF0,
+      0x10, 0x20, 0x40, 0x40, 0xF0, 0x90, 0xF0, 0x90, 0xF0, 0xF0, 0x90, 0xF0,
+      0x10, 0xF0, 0xF0, 0x90, 0xF0, 0x90, 0x90, 0xE0, 0x90, 0xE0, 0x90, 0xE0,
+      0xF0, 0x80, 0x80, 0x80, 0xF0, 0xE0, 0x90, 0x90, 0x90, 0xE0, 0xF0, 0x80,
+      0xF0, 0x80, 0xF0, 0xF0, 0x80, 0xF0, 0x80, 0x80};
+
+  memcpy(&chip->dram->memory[0x50], fontset, sizeof(fontset));
+  init_audio(chip);
+}
+
+void initROM(CPU *chip, FILEDRAM *file) {
+  if (file->size > (MEMORY_SIZE - ROM_START_ADDRESS)) {
+    printf("Erro: A ROM é muito grande para a memória do Chip-8.\n");
+    exit(-1);
+  }
+
+  // memcpy(&chip->dram->memory[ROM_START_ADDRESS], program, rom_size);
+  memcpy(&chip->dram->memory[ROM_START_ADDRESS], file->buffer, file->size);
+}
