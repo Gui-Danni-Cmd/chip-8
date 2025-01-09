@@ -28,7 +28,8 @@ bool initialize_display(Display *display) {
 void render_screen(struct Chip8 *chip8, Display *display) {
   SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
   SDL_RenderClear(display->renderer);
-
+  
+  
   SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
 
   for (int y = 0; y < SCREEN_HEIGHT; ++y) {

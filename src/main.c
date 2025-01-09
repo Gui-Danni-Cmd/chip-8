@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
     int keys[KEYS] = {0};
 
     while (SDL_PollEvent(&event)) {
+      
       if (event.type == SDL_QUIT) {
         printf("Fim\n");
         running = false;
@@ -45,7 +46,7 @@ int main(int argc, char **argv) {
 
     render_screen(&chip, &display);
 
-    SDL_Delay(10);
+    SDL_Delay(16);
   }
   return 0;
 }
